@@ -1,0 +1,35 @@
+{
+  "name": "astro-njx-muse",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Premium womenswear storefront: Astro + Tailwind v4 — ink-navy editorial with a transparent-to-solid masthead over a campaign hero slider, hover mega menu, Shop the Look hotspots, quick-size add on cards, cart and wishlist drawers, and a newsletter popup. Works out of the box with mock data, connects to Shopify Storefront API with two env vars.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "keywords": [
+    "astro",
+    "astro-theme",
+    "ecommerce",
+    "shopify",
+    "storefront",
+    "fashion",
+    "editorial",
+    "tailwindcss"
+  ],
+  "license": "MIT",
+  "homepage": "https://astro-njx-muse.pages.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/njbSaab/astro-njx-muse.git"
+  },
+  "author": "njbSaab (https://njxui.dev)",
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "astro": "^5.0.0",
+    "nanostores": "^0.11.0",
+    "@nanostores/persistent": "^0.10.0",
+    "tailwindcss": "^4.0.0"
+  }
+}

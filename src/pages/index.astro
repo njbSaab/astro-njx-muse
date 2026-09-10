@@ -1,0 +1,284 @@
+---
+// Noble Muse home — full-height campaign hero slider under a transparent
+// masthead, category tiles, double editorial banners, NEW IN carousel, a wide
+// tailoring banner, Shop the Look with "+" hotspot popovers, TOPSELLER
+// carousel, brand manifesto and a split newsletter section.
+import Layout from '../layouts/Layout.astro';
+import { commerce } from '../lib/commerce';
+
+const products = await commerce.listProducts();
+const itemListLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: products.slice(0, 24).map((p, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    url: `/products/${p.handle}`,
+    name: p.title,
+  })),
+});
+
+const HERO = [
+  { eyebrow: 'AUTUMN / WINTER 26', headline: 'NEW COLLECTION — GOLDEN HOUR', note: 'campaign 01 · tweed coat, stone facade', img: '/products/hero-1.jpg' },
+  { eyebrow: 'THE KNITWEAR ROOM', headline: 'WARMTH, CUT CLEAN', note: 'campaign 02 · cashmere, oak interior', img: '/products/hero-2.jpg' },
+  { eyebrow: 'SILK & TAILORING', headline: 'EVENINGS IN MULBERRY', note: 'campaign 03 · silk blouse, low light', img: '/products/hero-3.jpg' },
+];
+const TILES = [
+  { label: 'Jackets & Coats', note: 'coat on stone steps', img: '/products/cat-coats.jpg', cat: 'Jackets & Coats' },
+  { label: 'Knitwear', note: 'cashmere, warm light', img: '/products/cat-knitwear.jpg', cat: 'Sweaters & Hoodies' },
+  { label: 'Dresses', note: 'silk, wood interior', img: '/products/cat-dresses.jpg', cat: 'Dresses' },
+  { label: 'Blouses & Shirts', note: 'poplin, studio', img: '/products/cat-blouses.jpg', cat: 'Blouses' },
+];
+const BANNERS = [
+  { headline: 'THE TWEED STORY', img: '/products/banner-tweed.jpg', cat: 'Blazers' },
+  { headline: 'DENIM, RECUT', img: '/products/banner-denim.jpg', cat: 'Denim' },
+];
+// look tiles: image + product ids styled in the look
+const LOOKS = [
+  { note: 'look 01 · tweed & denim', span: 2, video: false, img: '/products/look-1.jpg', items: ['nm01', 'nm19'] },
+  { note: 'look 02 · knit layering', span: 1, video: true, img: '/products/look-2.jpg', items: ['nm11', 'nm21'] },
+  { note: 'look 03 · silk evening', span: 1, video: false, img: '/products/look-3.jpg', items: ['nm05', 'nm22'] },
+  { note: 'look 04 · coat & scarf', span: 1, video: false, img: '/products/look-4.jpg', items: ['nm15', 'nm27'] },
+  { note: 'look 05 · denim studio', span: 2, video: true, img: '/products/look-5.jpg', items: ['nm24', 'nm09'] },
+  { note: 'look 06 · office hours', span: 1, video: false, img: '/products/look-6.jpg', items: ['nm20', 'nm22'] },
+  { note: 'look 07 · weekend', span: 1, video: false, img: '/products/look-7.jpg', items: ['nm13', 'nm25'] },
+  { note: 'look 08 · mulberry', span: 1, video: false, img: '/products/look-8.jpg', items: ['nm02', 'nm14'] },
+];
+---
+
+<Layout heroHeader={true}>
+  <script type="application/ld+json" set:html={itemListLd} />
+
+  <!-- ── Hero slider (starts under the transparent masthead) ── -->
+  <section class="relative -mt-9 h-[calc(100vh-36px)] min-h-[620px] overflow-hidden bg-[#e6e2da]" style="margin-top:0">
+    {HERO.map((h, i) => (
+      <div data-hero-slide={i} class={'absolute inset-0 transition-opacity duration-[900ms] ' + (i === 0 ? 'opacity-100' : 'pointer-events-none opacity-0')}>
+        <img src={h.img} alt="" class="absolute inset-0 h-full w-full object-cover" />
+        <div class="absolute inset-0 bg-gradient-to-t from-ink/55 via-ink/10 to-ink/20"></div>
+        <div class="absolute inset-x-5 bottom-14 flex flex-col items-start gap-5 text-white lg:inset-x-9">
+          <div class="text-[11px] tracking-[0.28em]">{h.eyebrow}</div>
+          <div class="max-w-[16ch] text-[clamp(28px,3.4vw,46px)] font-normal leading-[1.15] tracking-[0.2em]">{h.headline}</div>
+          <a href="/catalog" class="cap link-u" style="letter-spacing:.22em">Shop now</a>
+        </div>
+        <div class="note absolute right-5 top-[120px] text-white/65 lg:right-9">{h.note}</div>
+      </div>
+    ))}
+    <div class="absolute bottom-6 left-5 z-[3] flex gap-2 lg:left-9">
+      {HERO.map((_, i) => (
+        <button data-hero-dot={i} aria-label="Slide" class={'h-[2px] w-[34px] cursor-pointer border-none p-0 transition-colors duration-300 ' + (i === 0 ? 'bg-white' : 'bg-white/40')}></button>
+      ))}
+    </div>
+  </section>
+
+  <!-- ── Category tiles ── -->
+  <section class="mx-auto max-w-[1640px] px-5 pt-24 lg:px-9">
+    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      {TILES.map((t) => (
+        <a href={`/catalog?cat=${encodeURIComponent(t.cat)}`} class="group relative block aspect-[3/4.2] overflow-hidden bg-tint">
+          <img src={t.img} alt={t.label} loading="lazy" class="absolute inset-0 h-full w-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.04]" />
+          <span class="absolute inset-0 bg-ink/25 transition-colors duration-300 group-hover:bg-ink/35"></span>
+          <span class="absolute inset-0 flex items-center justify-center">
+            <span class="cap-tag link-u text-white" style="letter-spacing:.22em;text-underline-offset:7px">{t.label}</span>
+          </span>
+          <span class="note absolute bottom-2.5 left-3 text-white/70">{t.note}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- ── Double banners ── -->
+  <section class="mx-auto max-w-[1640px] px-5 pt-24 lg:px-9">
+    <div class="grid gap-4 md:grid-cols-2">
+      {BANNERS.map((b) => (
+        <a href={`/catalog?cat=${encodeURIComponent(b.cat)}`} class="group relative block aspect-[4/3] overflow-hidden bg-[#e9e6df]">
+          <img src={b.img} alt={b.headline} loading="lazy" class="absolute inset-0 h-full w-full object-cover transition-transform duration-[900ms] group-hover:scale-[1.03]" />
+          <span class="absolute inset-0 bg-gradient-to-t from-ink/60 to-transparent"></span>
+          <span class="absolute bottom-10 left-10 flex flex-col items-start gap-4 text-white">
+            <span class="max-w-[14ch] text-[26px] leading-snug tracking-[0.18em]">{b.headline}</span>
+            <span class="cap link-u" style="letter-spacing:.22em">Shop now</span>
+          </span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- ── NEW IN carousel ── -->
+  <section class="pt-28">
+    <div class="mx-auto mb-8 flex max-w-[1640px] items-end justify-between px-5 lg:px-9">
+      <h2 class="m-0 text-[15px] font-normal tracking-[0.26em]">NEW IN</h2>
+      <div class="flex gap-2.5">
+        <button data-car-prev="new" class="btn-ghost h-[38px] w-[38px] text-[13px]">←</button>
+        <button data-car-next="new" class="btn-ghost h-[38px] w-[38px] text-[13px]">→</button>
+      </div>
+    </div>
+    <div data-carousel="new" class="no-scrollbar flex gap-4 overflow-x-auto px-5 pb-1 lg:px-9" style="scroll-behavior:smooth"></div>
+  </section>
+
+  <!-- ── Wide banner ── -->
+  <section class="relative mt-28 h-[74vh] min-h-[520px] overflow-hidden bg-[#e4e1da]">
+    <img src="/products/banner-wide.jpg" alt="" loading="lazy" class="absolute inset-0 h-full w-full object-cover" />
+    <div class="absolute inset-0 bg-ink/45"></div>
+    <div class="absolute inset-0 flex flex-col items-center justify-center gap-5 text-center text-white">
+      <div class="text-[11px] tracking-[0.3em]">THE TAILORING EDIT</div>
+      <div class="max-w-[18ch] text-[clamp(26px,3vw,40px)] leading-tight tracking-[0.2em]">SHAPE THE SEASON</div>
+      <a href="/catalog?cat=Blazers" class="cap link-u" style="letter-spacing:.22em">Shop now</a>
+    </div>
+  </section>
+
+  <!-- ── Shop the look ── -->
+  <section id="looks" class="mx-auto max-w-[1640px] scroll-mt-28 px-5 pt-28 lg:px-9">
+    <div class="mb-8 flex items-end justify-between">
+      <h2 class="m-0 text-[15px] font-normal tracking-[0.26em]">SHOP THE LOOK</h2>
+      <span class="cap-xs text-muted">Tap + to shop each look</span>
+    </div>
+    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4" style="grid-auto-rows:210px">
+      {LOOKS.map((l, i) => (
+        <div class="relative overflow-hidden bg-[#e6e2da]" style={`grid-row:span ${l.span}`} data-look={i}>
+          <img src={l.img} alt={l.note} loading="lazy" class="absolute inset-0 h-full w-full object-cover" />
+          <span class="absolute inset-0 bg-ink/15"></span>
+          <span class="note absolute left-3.5 top-3 text-white/80">{l.note}</span>
+          {l.video && (
+            <span class="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <span class="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-white/80 pl-[3px] text-[11px] text-white">▶</span>
+            </span>
+          )}
+          <button data-look-toggle={i} aria-label="Shop this look" class="absolute bottom-3.5 right-3.5 h-[38px] w-[38px] cursor-pointer rounded-full border border-white/70 bg-white/10 text-[15px] leading-none text-white transition-colors duration-300 [&.on]:bg-white [&.on]:text-ink">+</button>
+          <div data-look-pop={i} class="anim-fade absolute inset-x-4 bottom-16 z-[4] hidden flex-col gap-3.5 border border-line bg-white p-4 [&.on]:flex" data-items={l.items.join(',')}>
+            <div class="cap-xs text-muted">In this look</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ── Topseller carousel ── -->
+  <section class="pt-28">
+    <div class="mx-auto mb-8 flex max-w-[1640px] items-end justify-between px-5 lg:px-9">
+      <h2 class="m-0 text-[15px] font-normal tracking-[0.26em]">TOPSELLER</h2>
+      <div class="flex gap-2.5">
+        <button data-car-prev="top" class="btn-ghost h-[38px] w-[38px] text-[13px]">←</button>
+        <button data-car-next="top" class="btn-ghost h-[38px] w-[38px] text-[13px]">→</button>
+      </div>
+    </div>
+    <div data-carousel="top" class="no-scrollbar flex gap-4 overflow-x-auto px-5 pb-1 lg:px-9" style="scroll-behavior:smooth"></div>
+  </section>
+
+  <!-- ── Manifesto ── -->
+  <section class="mx-auto flex max-w-[900px] flex-col items-center gap-8 px-5 py-32 text-center">
+    <div class="text-[11px] tracking-[0.3em]">THE HOUSE</div>
+    <p class="m-0 text-[clamp(19px,2.2vw,26px)] leading-relaxed tracking-[0.06em]" style="text-wrap:pretty">Tailored for women who run the room. We cut pieces that hold their shape through long days and longer years — considered proportions, honest materials, nothing that shouts.</p>
+    <div class="cap flex flex-wrap justify-center gap-x-14 gap-y-2 text-soft" style="letter-spacing:.2em">
+      <span>Designed in Hamburg</span>
+      <span>Conscious materials</span>
+      <span>Made to last</span>
+    </div>
+  </section>
+
+  <!-- ── Newsletter split ── -->
+  <section class="border-t border-line">
+    <div class="grid items-stretch md:grid-cols-2">
+      <div class="relative min-h-[320px] bg-[#eae7e0] md:min-h-[460px]">
+        <img src="/products/newsletter.jpg" alt="" loading="lazy" class="absolute inset-0 h-full w-full object-cover" />
+      </div>
+      <div class="flex flex-col justify-center gap-5 px-6 py-16 lg:px-[72px] lg:py-24">
+        <div class="text-[11px] tracking-[0.3em]">NEWSLETTER</div>
+        <div class="text-[clamp(22px,2.4vw,30px)] leading-snug tracking-[0.14em]">SUBSCRIBE AND GET 10% OFF</div>
+        <p class="m-0 max-w-[44ch] text-[12px] leading-loose text-soft">New arrivals, private sales and lookbooks — twice a month, never more. Unsubscribe at any time.</p>
+        <form data-nl-form class="mt-2.5 flex max-w-[480px] border-b border-ink">
+          <input data-nl-email placeholder="Email address" class="flex-1 bg-transparent py-3.5 text-[12px] tracking-[0.08em] outline-none placeholder:text-muted" />
+          <button class="btn-ink px-7">Subscribe</button>
+        </form>
+        <span data-nl-msg class="min-h-[16px] text-[11px] text-soft"></span>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import { wishlist } from '../lib/stores';
+    import { esc, fmt, cardHTML } from '../lib/card';
+
+    const DATA = JSON.parse(document.body.dataset.muse!);
+    const PRODUCTS: any[] = DATA.products;
+    const byId = new Map(PRODUCTS.map((p) => [p.id, p]));
+    const $ = <T extends HTMLElement = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector(s) as T | null;
+    const $$ = <T extends HTMLElement = HTMLElement>(s: string, r: ParentNode = document) => [...r.querySelectorAll(s)] as T[];
+
+    // ── hero slider ─────────────────────────────────────────────
+    let hero = 0;
+    function showHero(i: number) {
+      hero = i;
+      $$('[data-hero-slide]').forEach((el) => {
+        const on = Number(el.dataset.heroSlide) === i;
+        el.classList.toggle('opacity-100', on);
+        el.classList.toggle('opacity-0', !on);
+        el.classList.toggle('pointer-events-none', !on);
+      });
+      $$('[data-hero-dot]').forEach((d) => {
+        const on = Number(d.dataset.heroDot) === i;
+        d.classList.toggle('bg-white', on);
+        d.classList.toggle('bg-white/40', !on);
+      });
+    }
+    let heroTimer = setInterval(() => showHero((hero + 1) % 3), 6500);
+    $$('[data-hero-dot]').forEach((d) => d.addEventListener('click', () => {
+      clearInterval(heroTimer);
+      showHero(Number(d.dataset.heroDot));
+      heroTimer = setInterval(() => showHero((hero + 1) % 3), 6500);
+    }));
+
+    // ── carousels ───────────────────────────────────────────────
+    const wished = (h: string) => wishlist.get().includes(h);
+    function fillCarousel(key: string, list: any[]) {
+      const el = $(`[data-carousel="${key}"]`);
+      if (el) el.innerHTML = list.map((p) => `<div class="w-[300px] flex-none">${cardHTML(p, wished(p.handle))}</div>`).join('');
+    }
+    const newIn = PRODUCTS.filter((p) => p.badge === 'NEW IN');
+    fillCarousel('new', [...newIn, ...PRODUCTS.slice(1, 6)].slice(0, 10));
+    fillCarousel('top', ['nm05', 'nm11', 'nm19', 'nm23', 'nm02', 'nm15', 'nm21', 'nm09', 'nm12', 'nm26'].map((id) => byId.get(id)).filter(Boolean));
+    $$('[data-car-prev]').forEach((b) => b.addEventListener('click', () => $(`[data-carousel="${b.dataset.carPrev}"]`)?.scrollBy({ left: -640, behavior: 'smooth' })));
+    $$('[data-car-next]').forEach((b) => b.addEventListener('click', () => $(`[data-carousel="${b.dataset.carNext}"]`)?.scrollBy({ left: 640, behavior: 'smooth' })));
+
+    // ── shop the look popovers ──────────────────────────────────
+    $$('[data-look-pop]').forEach((pop) => {
+      const items = (pop.dataset.items || '').split(',').map((id) => byId.get(id)).filter(Boolean);
+      pop.innerHTML += items.map((p: any) => `
+        <div class="flex items-center gap-3">
+          <img src="${p.image}" alt="" class="h-[52px] w-[40px] flex-none object-cover" />
+          <div class="flex min-w-0 flex-1 flex-col gap-1">
+            <a href="/products/${p.handle}" class="cap truncate" style="letter-spacing:.12em">${esc(p.name)}</a>
+            <span class="text-[11px] text-soft">${fmt(p.price)}</span>
+          </div>
+          <button data-look-add="${p.handle}" class="cap-xs link-u cursor-pointer" style="letter-spacing:.16em;text-underline-offset:4px">Add to bag</button>
+        </div>`).join('');
+    });
+    document.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      const tg = t.closest('[data-look-toggle]') as HTMLElement | null;
+      if (tg) {
+        const i = tg.dataset.lookToggle!;
+        const pop = $(`[data-look-pop="${i}"]`)!;
+        const on = !pop.classList.contains('on');
+        $$('[data-look-pop]').forEach((p) => p.classList.remove('on'));
+        $$('[data-look-toggle]').forEach((b) => b.classList.remove('on'));
+        if (on) { pop.classList.add('on'); tg.classList.add('on'); }
+        return;
+      }
+      const add = t.closest('[data-look-add]') as HTMLElement | null;
+      if (add) {
+        // reuse the quick-view flow so the visitor picks a size properly
+        document.dispatchEvent(new CustomEvent('njx:quickview', { detail: { handle: add.dataset.lookAdd } }));
+      }
+    });
+
+    // ── newsletter ──────────────────────────────────────────────
+    $('[data-nl-form]')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = $('[data-nl-email]') as HTMLInputElement;
+      const ok = input.value.includes('@');
+      $('[data-nl-msg]')!.textContent = ok ? 'Welcome — your code is MUSE10.' : 'Please enter a valid email address.';
+      if (ok) input.value = '';
+    });
+
+    // hearts repaint on wishlist change is handled by the layout
+  </script>
+</Layout>

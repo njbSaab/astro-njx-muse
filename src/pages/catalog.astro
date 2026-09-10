@@ -1,0 +1,98 @@
+---
+// Catalog — a single filterable grid: category / size / colour selects, a max
+// price slider and sorting, matching the prototype's slim filter bar. Reads
+// ?cat= and ?tag= (NEW IN / LAST CHANCE) from the URL.
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Clothing — NOBLE MUSE" description="The Noble Muse catalogue: dresses, blouses, knitwear, tailoring and denim in ink, cream and mulberry.">
+  <main class="mx-auto max-w-[1640px] px-5 pt-[150px] lg:px-9">
+    <div class="mb-11 flex flex-col gap-3">
+      <div class="cap-xs text-muted">HOME / <span data-crumb>CLOTHING</span></div>
+      <h1 class="m-0 text-[30px] font-normal tracking-[0.2em]" data-title>CLOTHING</h1>
+      <div class="text-[11px] tracking-[0.08em] text-soft" data-count></div>
+    </div>
+
+    <div class="mb-11 flex flex-wrap items-center justify-between gap-6 border-y border-line py-4">
+      <div class="flex flex-wrap items-center gap-6">
+        <select data-f-cat class="cap border-none bg-transparent"></select>
+        <select data-f-size class="cap border-none bg-transparent"></select>
+        <select data-f-color class="cap border-none bg-transparent"></select>
+        <div class="flex items-center gap-3">
+          <span class="cap text-muted">Max</span>
+          <input data-f-price type="range" min="40" max="300" step="10" value="300" class="w-[130px]" />
+          <span class="text-[11px]" data-f-price-label>€300</span>
+        </div>
+      </div>
+      <select data-f-sort class="cap border-none bg-transparent">
+        <option value="newest">Sort: Newest</option>
+        <option value="low">Sort: Price low to high</option>
+        <option value="high">Sort: Price high to low</option>
+      </select>
+    </div>
+
+    <div data-grid class="grid grid-cols-2 gap-4 lg:grid-cols-4"></div>
+  </main>
+
+  <script>
+    import { wishlist } from '../lib/stores';
+    import { esc, cardHTML } from '../lib/card';
+
+    const DATA = JSON.parse(document.body.dataset.muse!);
+    const PRODUCTS: any[] = DATA.products;
+    const CATS: string[] = DATA.cats;
+    const $ = <T extends HTMLElement = HTMLElement>(s: string) => document.querySelector(s) as T | null;
+
+    const qs = new URLSearchParams(location.search);
+    const F = {
+      cat: qs.get('cat') && CATS.includes(qs.get('cat')!) ? qs.get('cat')! : 'All',
+      tag: qs.get('tag') ?? '',
+      size: 'All', color: 'All', price: 300, sort: 'newest',
+    };
+
+    const sizes = ['All', 'XS', 'S', 'M', 'L', 'XL', '26', '27', '28', '29', '30', '31', 'ONE SIZE'];
+    const colors = ['All', ...new Set(PRODUCTS.flatMap((p) => p.colors.map((c: any) => c.name)))];
+    ($('[data-f-cat]') as HTMLSelectElement).innerHTML = ['All', ...CATS].map((c) => `<option value="${esc(c)}" ${c === F.cat ? 'selected' : ''}>${c === 'All' ? 'Category: All' : esc(c)}</option>`).join('');
+    ($('[data-f-size]') as HTMLSelectElement).innerHTML = sizes.map((s) => `<option value="${esc(s)}">${s === 'All' ? 'Size: All' : esc(s)}</option>`).join('');
+    ($('[data-f-color]') as HTMLSelectElement).innerHTML = colors.map((c) => `<option value="${esc(c)}">${c === 'All' ? 'Colour: All' : esc(c)}</option>`).join('');
+
+    function title() {
+      if (F.tag === 'NEW IN') return 'NEW IN';
+      if (F.tag === 'LAST CHANCE') return 'LAST CHANCE';
+      return F.cat === 'All' ? 'CLOTHING' : F.cat.toUpperCase();
+    }
+    function render() {
+      let list = PRODUCTS.filter((p) =>
+        (F.cat === 'All' || p.cat === F.cat) &&
+        (F.size === 'All' || p.sizes.includes(F.size)) &&
+        (F.color === 'All' || p.colors.some((c: any) => c.name === F.color)) &&
+        p.price <= F.price
+      );
+      if (F.tag === 'NEW IN') list = list.filter((p) => p.badge === 'NEW IN');
+      if (F.tag === 'LAST CHANCE') list = list.filter((p) => p.badge === 'LAST CHANCE' || p.oldPrice);
+      list = [...list].sort((a, b) =>
+        F.sort === 'low' ? a.price - b.price :
+        F.sort === 'high' ? b.price - a.price :
+        Number(b.badge === 'NEW IN') - Number(a.badge === 'NEW IN'));
+      $('[data-title]')!.textContent = title();
+      $('[data-crumb]')!.textContent = title();
+      $('[data-count]')!.textContent = list.length + ' pieces';
+      $('[data-grid]')!.innerHTML = list.length
+        ? list.map((p) => `<div class="mb-10">${cardHTML(p, wishlist.get().includes(p.handle))}</div>`).join('')
+        : `<div class="cap-tag col-span-full py-20 text-center text-muted">Nothing matches those filters.</div>`;
+    }
+
+    $('[data-f-cat]')?.addEventListener('change', (e) => { F.cat = (e.target as HTMLSelectElement).value; F.tag = ''; render(); });
+    $('[data-f-size]')?.addEventListener('change', (e) => { F.size = (e.target as HTMLSelectElement).value; render(); });
+    $('[data-f-color]')?.addEventListener('change', (e) => { F.color = (e.target as HTMLSelectElement).value; render(); });
+    $('[data-f-price]')?.addEventListener('input', (e) => {
+      F.price = Number((e.target as HTMLInputElement).value);
+      $('[data-f-price-label]')!.textContent = '€' + F.price;
+      render();
+    });
+    $('[data-f-sort]')?.addEventListener('change', (e) => { F.sort = (e.target as HTMLSelectElement).value; render(); });
+    wishlist.subscribe(render);
+
+    render();
+  </script>
+</Layout>

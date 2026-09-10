@@ -1,0 +1,591 @@
+---
+// Noble Muse — base layout: navy announcement bar, a fixed masthead that sits
+// transparent over the campaign hero and turns solid white on scroll/hover,
+// hover mega menu, slide-down search, cart + wishlist drawers, quick view,
+// a once-per-visitor newsletter popup, and a footer that ends in a giant
+// outlined wordmark.
+import '../styles/global.css';
+import { commerce, providerName } from '../lib/commerce';
+import catalog from '../data/mock-catalog.json';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  /** true on the home page: header starts transparent over the hero */
+  heroHeader?: boolean;
+}
+const {
+  title = 'NOBLE MUSE — premium womenswear Astro e-commerce theme',
+  description = 'Ink-navy editorial storefront on Astro + Tailwind v4: transparent-to-solid masthead over a campaign hero, hover mega menu, Shop the Look hotspots, quick-size add, cart and wishlist drawers.',
+  ogImage,
+  heroHeader = false,
+} = Astro.props;
+
+const siteOrigin = (Astro.site ?? new URL('https://astro-njx-muse.pages.dev')).origin;
+const canonicalURL = new URL(Astro.url.pathname, siteOrigin).href;
+const ogImageURL = new URL(ogImage ?? '/products/hero-1.jpg', siteOrigin).href;
+const ga4Id = import.meta.env.PUBLIC_GA4_ID;
+const orgLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'NOBLE MUSE',
+  url: siteOrigin,
+});
+
+const CATS = (catalog.collections[0] as any).categories.map((c: any) => c.name);
+const products = await commerce.listProducts();
+const clientData = JSON.stringify({
+  cats: CATS,
+  products: products.map((p) => ({
+    id: (p as any).id,
+    handle: p.handle,
+    name: p.title,
+    price: p.price.amount,
+    oldPrice: p.compareAtPrice?.amount ?? null,
+    image: p.images[0]?.src ?? '',
+    image2: p.images[1]?.src ?? '',
+    cat: (p as any).meta?.cat ?? '',
+    badge: (p as any).meta?.badge ?? '',
+    colors: (p as any).meta?.colors ?? [],
+    sizes: (p as any).meta?.sizes ?? [],
+  })),
+});
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="NOBLE MUSE" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={orgLd} />
+    {ga4Id && (
+      <>
+        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga4Id}`}></script>
+        <script is:inline define:vars={{ ga4Id }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          window.gtag = gtag;
+          gtag('js', new Date());
+          gtag('config', ga4Id);
+        </script>
+      </>
+    )}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  </head>
+  <body class="min-h-screen overflow-x-hidden bg-base font-sans font-light text-ink" data-provider={providerName} data-muse={clientData} data-hero-header={heroHeader ? '1' : ''}>
+    <!-- ── Announcement ── -->
+    <div class="flex h-9 items-center justify-center bg-ink text-white">
+      <a href="/catalog" class="cap link-u" style="letter-spacing:.18em">New Collection — Golden Hour</a>
+    </div>
+
+    <!-- ── Masthead (fixed; transparent over the hero, solid on scroll) ── -->
+    <header data-header class="fixed inset-x-0 top-0 z-[100] border-b border-transparent text-white transition-[background,color,border-color,transform] duration-[400ms]" style={heroHeader ? 'transform:translateY(36px)' : ''}>
+      <div class="mx-auto grid h-[86px] max-w-[1640px] grid-cols-[1fr_auto_1fr] items-center px-5 lg:px-9">
+        <nav class="cap flex items-center gap-4 whitespace-nowrap lg:gap-7">
+          <a href="/catalog?tag=NEW IN" data-mega-off>New In</a>
+          <a href="/catalog" data-mega-on class="hidden sm:inline">Clothing</a>
+          <a href="/catalog?tag=LAST CHANCE" data-mega-off data-lastchance>Last Chance</a>
+          <a href="/#looks" data-mega-off class="hidden md:inline">Shop the Look</a>
+        </nav>
+        <a href="/" data-mega-off class="flex flex-col items-center gap-1.5">
+          <span class="whitespace-nowrap text-[clamp(15px,1.5vw,24px)] font-normal leading-none tracking-[0.42em]" style="text-indent:.42em">NOBLE MUSE</span>
+          <span class="whitespace-nowrap text-[7px] leading-none tracking-[0.44em] opacity-70" style="text-indent:.44em">DRESSING MODERN MUSES</span>
+        </a>
+        <div class="flex items-center justify-end gap-4 whitespace-nowrap lg:gap-6" data-mega-off>
+          <button data-search-toggle aria-label="Search" class="flex cursor-pointer items-center">
+            <svg width="17" height="17" viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.1"><circle cx="7.2" cy="7.2" r="5.4"/><line x1="11.2" y1="11.2" x2="16" y2="16"/></svg>
+          </button>
+          <button data-open-wish aria-label="Wishlist" class="flex cursor-pointer items-center gap-1.5 text-[10px] tracking-[0.12em]">
+            <span class="text-[14px] leading-none">♥</span><span data-wish-count>0</span>
+          </button>
+          <button data-open-cart aria-label="Bag" class="flex cursor-pointer items-center gap-1.5 text-[10px] tracking-[0.12em]">
+            <svg width="15" height="17" viewBox="0 0 15 17" fill="none" stroke="currentColor" stroke-width="1.1"><rect x="1" y="5" width="13" height="11"/><path d="M4.6 5.2V3.6a2.9 2.9 0 0 1 5.8 0v1.6"/></svg>
+            <span data-cart-count>0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- mega -->
+      <div data-mega class="pointer-events-none absolute inset-x-0 top-full -translate-y-2.5 border-b border-line bg-white text-ink opacity-0 transition-all duration-[350ms]">
+        <div class="mx-auto grid max-w-[1640px] gap-10 px-5 py-12 md:grid-cols-[1fr_1fr_1.2fr] lg:gap-16 lg:px-9">
+          <div>
+            <div class="cap-xs mb-6 text-muted">Categories</div>
+            <div data-mega-cats class="flex flex-col gap-3 text-[12px] tracking-[0.05em]"></div>
+          </div>
+          <div>
+            <div class="cap-xs mb-6 text-muted">Highlights</div>
+            <div class="flex flex-col gap-3 text-[12px] tracking-[0.05em]">
+              {['Topseller', 'Matching Sets', 'Trend Colour: Mulberry', 'Balloon Shapes', 'Conscious Line'].map((h) => (
+                <a href="/catalog">{h}</a>
+              ))}
+            </div>
+          </div>
+          <div class="hidden flex-col items-start justify-end gap-4 border-l border-line pl-10 md:flex lg:pl-16">
+            <div class="text-[26px] leading-snug tracking-[0.14em]">GOLDEN HOUR</div>
+            <div class="max-w-[34ch] text-[12px] leading-loose text-soft">Tweed, brushed wool and washed silk in mulberry, cream and ink. The autumn edit, made to be worn past the season.</div>
+            <a href="/catalog" class="cap link-u" style="letter-spacing:.2em">Shop the collection</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- search -->
+      <div data-search class="pointer-events-none absolute inset-x-0 top-full -translate-y-2.5 border-b border-line bg-white text-ink opacity-0 transition-all duration-[350ms]">
+        <div class="mx-auto max-w-[1640px] px-5 py-10 lg:px-9">
+          <div class="flex items-center gap-4 border-b border-ink pb-3.5">
+            <svg width="18" height="18" viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.1"><circle cx="7.2" cy="7.2" r="5.4"/><line x1="11.2" y1="11.2" x2="16" y2="16"/></svg>
+            <input data-search-input placeholder="What are you looking for?" class="flex-1 bg-transparent p-0 text-[20px] tracking-[0.06em] outline-none placeholder:text-muted" />
+            <button data-search-close class="cap cursor-pointer" style="letter-spacing:.18em">Close</button>
+          </div>
+          <div data-search-results class="mt-6 hidden flex-col [&.show]:flex"></div>
+          <div class="mt-7 flex flex-wrap items-center gap-4">
+            <span class="cap-xs text-muted">Popular searches</span>
+            {['Tweed blazer', 'Silk blouse', 'Barrel jean', 'Wool coat', 'Mulberry', 'Knitwear'].map((q) => (
+              <button data-pop-search={q} class="cap-tag cursor-pointer border border-line px-3.5 py-2">{q}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <slot />
+
+    <!-- ── Footer ── -->
+    <footer class="mt-32 border-t border-line">
+      <div class="mx-auto grid max-w-[1640px] gap-10 px-5 pt-20 md:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_1.2fr] lg:gap-12 lg:px-9">
+        {[
+          ['Shop', ['New In', 'Clothing', 'Last Chance', 'Shop the Look', 'Gift cards']],
+          ['Service', ['Delivery & returns', 'Size guide', 'Payment', 'Track your order', 'Contact']],
+          ['House', ['About Noble Muse', 'Sustainability', 'Materials', 'Stores', 'Careers']],
+          ['Account', ['Sign in', 'Create account', 'Wishlist', 'Newsletter', 'Student discount']],
+        ].map(([title, links]) => (
+          <div class="flex flex-col gap-4">
+            <div class="cap-xs text-muted">{title}</div>
+            {(links as string[]).map((l) => (
+              <a href="/catalog" class="text-[11px] tracking-[0.08em] text-soft">{l}</a>
+            ))}
+          </div>
+        ))}
+        <div class="flex flex-col gap-5">
+          <div class="cap-xs text-muted">Stay close</div>
+          <div class="cap flex gap-4">
+            <a href="#">Instagram</a><a href="#">Pinterest</a><a href="#">TikTok</a><a href="#">Journal</a>
+          </div>
+          <a href="#" class="cap inline-flex w-fit items-center gap-2.5 rounded-full border border-ink px-5 py-3" style="letter-spacing:.14em">WhatsApp signup — 10% off your first order</a>
+          <div class="flex flex-wrap items-center gap-3.5">
+            <select class="cap border border-line bg-transparent px-3 py-2.5" style="letter-spacing:.14em">
+              <option>GERMANY — EUR €</option><option>AUSTRIA — EUR €</option><option>SWITZERLAND — CHF</option><option>UNITED KINGDOM — GBP £</option>
+            </select>
+            <select class="cap border border-line bg-transparent px-3 py-2.5" style="letter-spacing:.14em">
+              <option>ENGLISH</option><option>DEUTSCH</option>
+            </select>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            {['VISA', 'MASTERCARD', 'PAYPAL', 'KLARNA', 'APPLE PAY', 'SEPA'].map((p) => (
+              <span class="border border-line px-2.5 py-1.5 text-[8px] tracking-[0.14em] text-muted">{p}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div class="mx-auto max-w-[1640px] px-5 pt-16 lg:px-9">
+        <div class="overflow-hidden whitespace-nowrap text-center leading-[0.9] tracking-[0.06em] text-transparent" style="font-size:clamp(56px,12.4vw,210px);-webkit-text-stroke:1px #d8d5cd">NOBLE MUSE</div>
+      </div>
+      <div class="mx-auto flex max-w-[1640px] flex-wrap justify-between gap-4 px-5 pb-10 pt-6 text-[10px] tracking-[0.1em] text-muted lg:px-9">
+        <span>© <span data-year></span> Noble Muse GmbH — Muse theme for Astro · {providerName} provider</span>
+        <span class="flex gap-5"><a href="#">Imprint</a><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookie settings</a></span>
+      </div>
+    </footer>
+
+    <!-- ── Drawer overlay ── -->
+    <div data-overlay class="pointer-events-none fixed inset-0 z-[150] bg-ink/30 opacity-0 transition-opacity duration-[400ms] [&.on]:pointer-events-auto [&.on]:opacity-100"></div>
+
+    <!-- ── Cart drawer ── -->
+    <aside data-cart-drawer class="fixed bottom-0 right-0 top-0 z-[160] flex w-[min(440px,92vw)] translate-x-[102%] flex-col border-l border-line bg-white transition-transform duration-[450ms] [&.on]:translate-x-0">
+      <div class="flex items-center justify-between border-b border-line px-7 pb-5 pt-7">
+        <span class="tracking-[0.24em] text-[11px]">SHOPPING BAG (<span data-cart-count>0</span>)</span>
+        <button data-drawer-close class="cap cursor-pointer" style="letter-spacing:.18em">Close</button>
+      </div>
+      <div class="flex flex-col gap-3 border-b border-line px-7 py-5">
+        <div data-ship-msg class="text-[10px] tracking-[0.1em] text-soft"></div>
+        <div class="h-[2px] bg-linesoft"><div data-ship-bar class="h-[2px] bg-acc transition-[width] duration-500" style="width:0%"></div></div>
+      </div>
+      <div data-cart-lines class="flex-1 overflow-auto px-7 py-2"></div>
+      <div class="flex flex-col gap-4 border-t border-line px-7 pb-8 pt-6">
+        <div class="flex justify-between text-[12px] tracking-[0.1em]"><span>SUBTOTAL</span><span data-cart-subtotal>€0.00</span></div>
+        <button data-checkout class="btn-ink p-4">Go to checkout</button>
+      </div>
+    </aside>
+
+    <!-- ── Wishlist drawer ── -->
+    <aside data-wish-drawer class="fixed bottom-0 right-0 top-0 z-[160] flex w-[min(440px,92vw)] translate-x-[102%] flex-col border-l border-line bg-white transition-transform duration-[450ms] [&.on]:translate-x-0">
+      <div class="flex items-center justify-between border-b border-line px-7 pb-5 pt-7">
+        <span class="tracking-[0.24em] text-[11px]">WISHLIST (<span data-wish-count>0</span>)</span>
+        <button data-drawer-close class="cap cursor-pointer" style="letter-spacing:.18em">Close</button>
+      </div>
+      <div data-wish-lines class="flex-1 overflow-auto px-7 py-2"></div>
+    </aside>
+
+    <!-- ── Quick view ── -->
+    <div data-qv-root class="fixed inset-0 z-[200] hidden items-center justify-center p-5 lg:p-10 [&.on]:flex">
+      <div data-qv-dim class="absolute inset-0 bg-ink/30"></div>
+      <div data-qv-panel class="anim-pop relative grid max-h-[88vh] w-[min(1100px,100%)] overflow-auto bg-white md:grid-cols-2"></div>
+    </div>
+
+    <!-- ── Newsletter popup ── -->
+    <div data-popup class="fixed inset-0 z-[300] hidden items-center justify-center p-5 lg:p-10 [&.on]:flex">
+      <div data-popup-dim class="absolute inset-0 bg-ink/30"></div>
+      <div class="anim-pop relative grid w-[min(900px,100%)] bg-white md:grid-cols-2">
+        <img src="/products/popup.jpg" alt="" class="hidden min-h-[420px] w-full object-cover md:block" />
+        <div class="flex flex-col justify-center gap-4 p-8 lg:p-11">
+          <div class="flex justify-end"><button data-popup-close class="cap cursor-pointer" style="letter-spacing:.18em">Close</button></div>
+          <div class="text-[24px] leading-snug tracking-[0.14em]">SUBSCRIBE AND GET 10% OFF</div>
+          <p class="m-0 text-[12px] leading-loose text-soft">Join the list for first access to new arrivals and private sales.</p>
+          <div class="mt-1.5 flex border-b border-ink">
+            <input data-popup-email placeholder="Email address" class="flex-1 bg-transparent py-3 text-[12px] tracking-[0.08em] outline-none placeholder:text-muted" />
+          </div>
+          <button data-popup-sub class="btn-ink p-4">Subscribe</button>
+          <button data-popup-close class="cap-xs cursor-pointer text-muted">No thanks</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Toast ── -->
+    <div data-toast class="pointer-events-none fixed bottom-6 left-1/2 z-[320] -translate-x-1/2 opacity-0 transition-all duration-300">
+      <p class="cap-tag border border-line bg-white px-4 py-2.5" data-toast-text></p>
+    </div>
+
+    <script>
+      import { cart, addToCart, setCartQty, wishlist, toggleWishlist, popupSeen } from '../lib/stores';
+      import { esc, fmt, cardHTML } from '../lib/card';
+
+      const DATA = JSON.parse(document.body.dataset.muse!);
+      const PRODUCTS: any[] = DATA.products;
+      const byHandle = new Map(PRODUCTS.map((p) => [p.handle, p]));
+      const $ = <T extends HTMLElement = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector(s) as T | null;
+      const $$ = <T extends HTMLElement = HTMLElement>(s: string, r: ParentNode = document) => [...r.querySelectorAll(s)] as T[];
+      const FREE_SHIP = 150;
+      (window as any).njxMuse = { PRODUCTS, cardHTML, wished: (h: string) => wishlist.get().includes(h) };
+
+      // ── toast ─────────────────────────────────────────────────
+      let toastT: ReturnType<typeof setTimeout>;
+      function toast(msg: string) {
+        const t = $('[data-toast]')!;
+        $('[data-toast-text]')!.textContent = msg;
+        t.style.opacity = '1';
+        clearTimeout(toastT);
+        toastT = setTimeout(() => { t.style.opacity = '0'; }, 2200);
+      }
+
+      // ── header: transparent over hero, solid otherwise ────────
+      const header = $('[data-header]')!;
+      const heroMode = document.body.dataset.heroHeader === '1';
+      let hover = false, megaOpen = false, searchOpen = false, scrolled = !heroMode;
+      function paintHeader() {
+        const solid = scrolled || hover || megaOpen || searchOpen || !heroMode;
+        header.classList.toggle('bg-white', solid);
+        header.classList.toggle('text-ink', solid);
+        header.classList.toggle('text-white', !solid);
+        header.classList.toggle('border-line', solid);
+        header.classList.toggle('border-transparent', !solid);
+        header.style.transform = scrolled || !heroMode ? 'translateY(0)' : 'translateY(36px)';
+        const lc = $('[data-lastchance]');
+        if (lc) lc.style.color = solid ? '#6f5bd6' : '#c8bef5';
+      }
+      if (heroMode) {
+        addEventListener('scroll', () => {
+          const s = scrollY > innerHeight * 0.72;
+          if (s !== scrolled) { scrolled = s; paintHeader(); }
+        }, { passive: true });
+      }
+      header.addEventListener('mouseenter', () => { hover = true; paintHeader(); });
+      header.addEventListener('mouseleave', () => { hover = false; megaOpen = false; paintMega(); paintHeader(); });
+
+      // ── mega ──────────────────────────────────────────────────
+      const mega = $('[data-mega]')!;
+      function paintMega() {
+        mega.classList.toggle('opacity-100', megaOpen);
+        mega.classList.toggle('opacity-0', !megaOpen);
+        mega.classList.toggle('translate-y-0', megaOpen);
+        mega.classList.toggle('-translate-y-2.5', !megaOpen);
+        mega.classList.toggle('pointer-events-auto', megaOpen);
+        mega.classList.toggle('pointer-events-none', !megaOpen);
+      }
+      $('[data-mega-on]')?.addEventListener('mouseenter', () => { megaOpen = true; searchOpen = false; paintMega(); paintSearch(); paintHeader(); });
+      $$('[data-mega-off]').forEach((el) => el.addEventListener('mouseenter', () => { if (megaOpen) { megaOpen = false; paintMega(); paintHeader(); } }));
+      $('[data-mega-cats]')!.innerHTML = ['View all', ...DATA.cats].map((c: string) =>
+        `<a href="/catalog${c === 'View all' ? '' : '?cat=' + encodeURIComponent(c)}">${esc(c)}</a>`).join('');
+
+      // ── search panel ──────────────────────────────────────────
+      const searchEl = $('[data-search]')!;
+      const searchInput = $('[data-search-input]') as HTMLInputElement;
+      function paintSearch() {
+        searchEl.classList.toggle('opacity-100', searchOpen);
+        searchEl.classList.toggle('opacity-0', !searchOpen);
+        searchEl.classList.toggle('translate-y-0', searchOpen);
+        searchEl.classList.toggle('-translate-y-2.5', !searchOpen);
+        searchEl.classList.toggle('pointer-events-auto', searchOpen);
+        searchEl.classList.toggle('pointer-events-none', !searchOpen);
+      }
+      $('[data-search-toggle]')?.addEventListener('click', () => { searchOpen = !searchOpen; megaOpen = false; paintMega(); paintSearch(); paintHeader(); if (searchOpen) setTimeout(() => searchInput.focus(), 60); });
+      $('[data-search-close]')?.addEventListener('click', () => { searchOpen = false; paintSearch(); paintHeader(); });
+      function renderSearchResults() {
+        const q = searchInput.value.trim().toLowerCase();
+        const box = $('[data-search-results]')!;
+        if (!q) { box.classList.remove('show'); box.innerHTML = ''; return; }
+        const hits = PRODUCTS.filter((p) => (p.name + ' ' + p.cat).toLowerCase().includes(q)).slice(0, 5);
+        box.classList.add('show');
+        box.innerHTML = hits.length ? hits.map((p) => `
+          <a href="/products/${p.handle}" class="flex items-center gap-4 border-b border-linesoft py-3">
+            <img src="${p.image}" alt="" class="h-[52px] w-[40px] object-cover" />
+            <span class="cap-tag flex-1">${esc(p.name)}</span>
+            <span class="text-[12px]">${fmt(p.price)}</span>
+          </a>`).join('') : `<div class="cap-tag py-4 text-muted">Nothing found — try a different word.</div>`;
+      }
+      searchInput?.addEventListener('input', renderSearchResults);
+      $$('[data-pop-search]').forEach((b) => b.addEventListener('click', () => { searchOpen = true; paintSearch(); paintHeader(); searchInput.value = b.dataset.popSearch!; renderSearchResults(); searchInput.focus(); }));
+
+      // ── drawers ───────────────────────────────────────────────
+      const overlay = $('[data-overlay]')!;
+      const cartDrawer = $('[data-cart-drawer]')!;
+      const wishDrawer = $('[data-wish-drawer]')!;
+      function setDrawer(which: 'cart' | 'wish' | null) {
+        overlay.classList.toggle('on', !!which);
+        cartDrawer.classList.toggle('on', which === 'cart');
+        wishDrawer.classList.toggle('on', which === 'wish');
+        document.body.style.overflow = which ? 'hidden' : '';
+      }
+      overlay.addEventListener('click', () => setDrawer(null));
+      $$('[data-drawer-close]').forEach((b) => b.addEventListener('click', () => setDrawer(null)));
+      $$('[data-open-cart]').forEach((b) => b.addEventListener('click', () => setDrawer('cart')));
+      $$('[data-open-wish]').forEach((b) => b.addEventListener('click', () => setDrawer('wish')));
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { setDrawer(null); qvClose(); popupEl.classList.remove('on'); } });
+
+      // ── cart ──────────────────────────────────────────────────
+      function renderCart() {
+        const lines = cart.get();
+        const count = lines.reduce((a, l) => a + l.quantity, 0);
+        $$('[data-cart-count]').forEach((n) => (n.textContent = String(count)));
+        const subtotal = lines.reduce((a, l) => a + (byHandle.get(l.handle)?.price ?? 0) * l.quantity, 0);
+        const remaining = Math.max(0, FREE_SHIP - subtotal);
+        $('[data-ship-msg]')!.textContent = remaining > 0 ? `You are ${fmt(remaining)} away from free shipping` : 'You have earned free shipping';
+        $('[data-ship-bar]')!.style.width = Math.min(100, (subtotal / FREE_SHIP) * 100) + '%';
+        $('[data-cart-subtotal]')!.textContent = fmt(subtotal);
+        $('[data-cart-lines]')!.innerHTML = lines.length ? lines.map((l) => {
+          const p = byHandle.get(l.handle); if (!p) return '';
+          return `<div class="flex gap-4 border-b border-linesoft py-6">
+            <img src="${p.image}" alt="" class="h-[78px] w-[58px] flex-none object-cover" />
+            <div class="flex min-w-0 flex-1 flex-col gap-2">
+              <a href="/products/${p.handle}" class="cap-tag">${esc(p.name)}</a>
+              <span class="cap-xs text-muted" style="letter-spacing:.08em">Size ${esc(l.size)} · ${esc(l.color)}</span>
+              <div class="mt-1.5 flex items-center justify-between">
+                <span class="flex items-center border border-line">
+                  <button data-l-dec="${esc(l.key)}" class="h-[30px] w-[30px] cursor-pointer">−</button>
+                  <span class="w-[26px] text-center text-[11px]">${l.quantity}</span>
+                  <button data-l-inc="${esc(l.key)}" class="h-[30px] w-[30px] cursor-pointer">+</button>
+                </span>
+                <span class="text-[12px]">${fmt(p.price * l.quantity)}</span>
+              </div>
+            </div>
+          </div>`;
+        }).join('') : `<div class="cap-tag py-16 text-center text-muted">Your bag is empty.</div>`;
+      }
+      cart.subscribe(renderCart);
+      $('[data-cart-lines]')?.addEventListener('click', (e) => {
+        const t = (e.target as HTMLElement).closest('button') as HTMLElement | null;
+        if (!t) return;
+        const line = (k: string) => cart.get().find((x) => x.key === k);
+        if (t.dataset.lInc) { const l = line(t.dataset.lInc); if (l) setCartQty(l.key, l.quantity + 1); }
+        if (t.dataset.lDec) { const l = line(t.dataset.lDec); if (l) setCartQty(l.key, l.quantity - 1); }
+      });
+      $('[data-checkout]')?.addEventListener('click', () => toast('Demo checkout — connect Shopify for the real one'));
+
+      // ── wishlist ──────────────────────────────────────────────
+      function renderWish() {
+        const list = wishlist.get();
+        $$('[data-wish-count]').forEach((n) => (n.textContent = String(list.length)));
+        $('[data-wish-lines]')!.innerHTML = list.length ? list.map((h) => {
+          const p = byHandle.get(h); if (!p) return '';
+          return `<div class="flex gap-4 border-b border-linesoft py-6">
+            <img src="${p.image}" alt="" class="h-[78px] w-[58px] flex-none object-cover" />
+            <div class="flex min-w-0 flex-1 flex-col gap-2">
+              <a href="/products/${p.handle}" class="cap-tag">${esc(p.name)}</a>
+              <span class="text-[11px] text-soft">${fmt(p.price)}</span>
+              <div class="mt-1.5 flex gap-4">
+                <button data-w-move="${p.handle}" class="cap-xs link-u cursor-pointer" style="letter-spacing:.16em;text-underline-offset:4px">Move to bag</button>
+                <button data-w-rm="${p.handle}" class="cap-xs cursor-pointer text-muted" style="letter-spacing:.16em">Remove</button>
+              </div>
+            </div>
+          </div>`;
+        }).join('') : `<div class="cap-tag py-16 text-center text-muted">No saved pieces yet.</div>`;
+        // repaint any card hearts on the page
+        $$('[data-card-wish]').forEach((b) => {
+          const on = list.includes(b.dataset.cardWish!);
+          b.classList.toggle('text-acc', on);
+          b.classList.toggle('text-ink/45', !on);
+        });
+      }
+      wishlist.subscribe(renderWish);
+      $('[data-wish-lines]')?.addEventListener('click', (e) => {
+        const t = (e.target as HTMLElement).closest('button') as HTMLElement | null;
+        if (!t) return;
+        if (t.dataset.wMove) {
+          const p = byHandle.get(t.dataset.wMove);
+          if (p) { addToCart(p.handle, p.sizes[1] ?? p.sizes[0], p.colors[0]?.name ?? ''); toggleWishlist(p.handle); setDrawer('cart'); }
+        }
+        if (t.dataset.wRm) toggleWishlist(t.dataset.wRm);
+      });
+
+      // ── quick view ────────────────────────────────────────────
+      const qvRoot = $('[data-qv-root]')!;
+      let qvState = { handle: '', color: 0, size: '', acc: 'fabric' };
+      const qvClose = () => qvRoot.classList.remove('on');
+      $('[data-qv-dim]')?.addEventListener('click', qvClose);
+      function openQuickView(handle: string, keep = false) {
+        const p = byHandle.get(handle); if (!p) return;
+        if (!keep) qvState = { handle, color: 0, size: '', acc: 'fabric' };
+        qvState.handle = handle;
+        const accs = [
+          ['fabric', 'Fabric & care', 'Main fabric 68% virgin wool, 32% recycled polyamide. Dry clean only. Store folded to hold the shape.'],
+          ['fit', 'Fit & measurements', 'Regular fit with a slightly dropped shoulder. Model is 178 cm and wears size S. Length 96 cm in size S.'],
+          ['ship', 'Delivery & returns', 'Free delivery on orders above €150. Returns free within 30 days.'],
+        ];
+        $('[data-qv-panel]')!.innerHTML = `
+          <div class="flex flex-col gap-0.5 bg-tint">
+            <img src="${p.image}" alt="${esc(p.name)}" class="aspect-[3/4] w-full object-cover" />
+            ${p.image2 ? `<img src="${p.image2}" alt="" class="aspect-[3/4] w-full object-cover" />` : ''}
+          </div>
+          <div class="flex flex-col gap-5 p-8 lg:p-12">
+            <div class="flex items-start justify-between gap-5">
+              <div class="flex flex-col gap-2.5">
+                <div class="cap-xs text-muted">${esc(p.cat.toUpperCase())}</div>
+                <h3 class="m-0 text-[20px] font-normal tracking-[0.16em]">${esc(p.name.toUpperCase())}</h3>
+              </div>
+              <button data-qv-close class="cap cursor-pointer" style="letter-spacing:.18em">Close</button>
+            </div>
+            <div class="text-[14px] tracking-[0.05em]">${p.oldPrice ? `<span class="text-acc">${fmt(p.price)}</span> <span class="text-muted line-through">· was ${fmt(p.oldPrice)}</span>` : fmt(p.price)}</div>
+            <div class="flex flex-col gap-3">
+              <div class="cap-xs text-muted">COLOUR — ${esc(p.colors[qvState.color]?.name ?? '')}</div>
+              <div class="flex gap-2">
+                ${p.colors.map((c: any, i: number) => `<button data-qv-color="${i}" class="h-[18px] w-[18px] cursor-pointer border ${i === qvState.color ? 'border-ink' : 'border-line'}" style="background:${c.hex}"></button>`).join('')}
+              </div>
+            </div>
+            <div class="flex flex-col gap-3">
+              <div class="cap-xs text-muted">SIZE</div>
+              <div class="flex flex-wrap gap-2">
+                ${p.sizes.map((z: string, i: number) => `<button data-qv-size="${esc(z)}" class="cap cursor-pointer border px-4 py-2.5 transition ${qvState.size === z ? 'border-ink bg-ink text-white' : 'border-line'}" style="letter-spacing:.14em">${esc(z)}${i === 3 ? ' — 2 left' : ''}</button>`).join('')}
+              </div>
+              <div class="text-[10px] tracking-[0.08em] text-muted">Model is 178 cm and wears size S</div>
+            </div>
+            <button data-qv-add class="btn-ink mt-1.5 p-4 ${qvState.size ? '' : 'is-off'}">${qvState.size ? 'Add to bag — ' + esc(qvState.size) : 'Select a size'}</button>
+            <div class="mt-2.5 border-t border-line">
+              ${accs.map((a) => `
+                <div class="border-b border-line">
+                  <button data-qv-acc="${a[0]}" class="cap flex w-full cursor-pointer justify-between py-4" style="letter-spacing:.18em"><span>${a[1]}</span><span>${qvState.acc === a[0] ? '−' : '+'}</span></button>
+                  ${qvState.acc === a[0] ? `<div class="pb-5 text-[12px] leading-loose text-soft">${a[2]}</div>` : ''}
+                </div>`).join('')}
+            </div>
+            <a href="/products/${p.handle}" class="cap link-u self-start" style="letter-spacing:.2em">Full product page</a>
+          </div>`;
+        qvRoot.classList.add('on');
+      }
+      $('[data-qv-panel]')?.addEventListener('click', (e) => {
+        const t = e.target as HTMLElement;
+        if (t.closest('[data-qv-close]')) { qvClose(); return; }
+        const co = t.closest('[data-qv-color]') as HTMLElement | null;
+        if (co) { qvState.color = Number(co.dataset.qvColor); openQuickView(qvState.handle, true); return; }
+        const sz = t.closest('[data-qv-size]') as HTMLElement | null;
+        if (sz) { qvState.size = sz.dataset.qvSize!; openQuickView(qvState.handle, true); return; }
+        const ac = t.closest('[data-qv-acc]') as HTMLElement | null;
+        if (ac) { qvState.acc = qvState.acc === ac.dataset.qvAcc ? '' : ac.dataset.qvAcc!; openQuickView(qvState.handle, true); return; }
+        if (t.closest('[data-qv-add]')) {
+          if (!qvState.size) return;
+          const p = byHandle.get(qvState.handle)!;
+          addToCart(p.handle, qvState.size, p.colors[qvState.color]?.name ?? '');
+          qvClose();
+          setDrawer('cart');
+        }
+      });
+      document.addEventListener('njx:quickview', ((e: CustomEvent) => openQuickView(e.detail.handle)) as EventListener);
+
+      // ── global card delegation ────────────────────────────────
+      document.addEventListener('click', (e) => {
+        const t = e.target as HTMLElement;
+        const wish = t.closest('[data-card-wish]') as HTMLElement | null;
+        if (wish) {
+          e.preventDefault();
+          const added = toggleWishlist(wish.dataset.cardWish!);
+          toast(added ? 'Saved to wishlist' : 'Removed from wishlist');
+          return;
+        }
+        const qv = t.closest('[data-card-qv]') as HTMLElement | null;
+        if (qv) { e.preventDefault(); openQuickView(qv.dataset.cardQv!); return; }
+        const open = t.closest('[data-card-open-sizes]') as HTMLElement | null;
+        if (open) {
+          e.preventDefault();
+          const card = open.closest('[data-card]')!;
+          card.querySelector('[data-card-bar]')!.classList.add('hidden');
+          const sizes = card.querySelector('[data-card-sizes]')!;
+          sizes.classList.remove('hidden');
+          sizes.classList.add('flex');
+          return;
+        }
+        const size = t.closest('[data-card-size]') as HTMLElement | null;
+        if (size) {
+          e.preventDefault();
+          const card = size.closest('[data-card]') as HTMLElement;
+          const p = byHandle.get(size.dataset.h!)!;
+          const ci = Number(card.dataset.color || 0);
+          addToCart(p.handle, size.dataset.cardSize!, p.colors[ci]?.name ?? '');
+          card.querySelector('[data-card-sizes]')!.classList.add('hidden');
+          card.querySelector('[data-card-bar]')!.classList.remove('hidden');
+          setDrawer('cart');
+          return;
+        }
+        const sw = t.closest('[data-card-swatch]') as HTMLElement | null;
+        if (sw) {
+          e.preventDefault();
+          const card = sw.closest('[data-card]') as HTMLElement;
+          card.dataset.color = sw.dataset.cardSwatch!;
+          card.querySelectorAll<HTMLElement>('[data-card-swatch]').forEach((b) => {
+            b.classList.toggle('border-ink', b === sw);
+            b.classList.toggle('border-line', b !== sw);
+          });
+        }
+      });
+
+      // ── newsletter popup: once per visitor, after 6s ──────────
+      const popupEl = $('[data-popup]')!;
+      if (!popupSeen.get()) {
+        setTimeout(() => { if (!popupSeen.get()) { popupEl.classList.add('on'); } }, 6000);
+      }
+      const closePopup = () => { popupEl.classList.remove('on'); popupSeen.set('1'); };
+      $$('[data-popup-close]').forEach((b) => b.addEventListener('click', closePopup));
+      $('[data-popup-dim]')?.addEventListener('click', closePopup);
+      $('[data-popup-sub]')?.addEventListener('click', () => {
+        const ok = ($('[data-popup-email]') as HTMLInputElement).value.includes('@');
+        toast(ok ? 'Welcome — your code is MUSE10' : 'Please enter a valid email');
+        if (ok) closePopup();
+      });
+
+      // ── init ──────────────────────────────────────────────────
+      $('[data-year]')!.textContent = String(new Date().getFullYear());
+      paintHeader(); paintMega(); paintSearch();
+      renderCart(); renderWish();
+      document.dispatchEvent(new CustomEvent('njx:ready'));
+    </script>
+  </body>
+</html>
