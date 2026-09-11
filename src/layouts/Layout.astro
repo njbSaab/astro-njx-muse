@@ -178,7 +178,7 @@ const clientData = JSON.stringify({
 
     <!-- ── Footer ── -->
     <footer class="mt-14 border-t border-line sm:mt-24 lg:mt-32">
-      <div class="mx-auto grid max-w-[1640px] gap-10 px-5 pt-20 md:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_1.2fr] lg:gap-12 lg:px-9">
+      <div class="mx-auto grid max-w-[1640px] grid-cols-2 gap-7 px-4 pt-10 sm:gap-10 sm:px-5 sm:pt-20 lg:grid-cols-4 lg:gap-12 lg:px-9">
         {[
           ['Shop', ['New In', 'Clothing', 'Last Chance', 'Shop the Look', 'Gift cards']],
           ['Service', ['Delivery & returns', 'Size guide', 'Payment', 'Track your order', 'Contact']],
@@ -192,26 +192,6 @@ const clientData = JSON.stringify({
             ))}
           </div>
         ))}
-        <div class="flex flex-col gap-5">
-          <div class="cap-xs text-muted">Stay close</div>
-          <div class="cap flex gap-4">
-            <a href="#">Instagram</a><a href="#">Pinterest</a><a href="#">TikTok</a><a href="#">Journal</a>
-          </div>
-          <a href="#" class="cap inline-flex w-fit items-center gap-2.5 rounded-full border border-ink px-5 py-3" style="letter-spacing:.14em">WhatsApp signup — 10% off your first order</a>
-          <div class="flex flex-wrap items-center gap-3.5">
-            <select class="cap border border-line bg-transparent px-3 py-2.5" style="letter-spacing:.14em">
-              <option>GERMANY — EUR €</option><option>AUSTRIA — EUR €</option><option>SWITZERLAND — CHF</option><option>UNITED KINGDOM — GBP £</option>
-            </select>
-            <select class="cap border border-line bg-transparent px-3 py-2.5" style="letter-spacing:.14em">
-              <option>ENGLISH</option><option>DEUTSCH</option>
-            </select>
-          </div>
-          <div class="flex flex-wrap gap-2">
-            {['VISA', 'MASTERCARD', 'PAYPAL', 'KLARNA', 'APPLE PAY', 'SEPA'].map((p) => (
-              <span class="border border-line px-2.5 py-1.5 text-[8px] tracking-[0.14em] text-muted">{p}</span>
-            ))}
-          </div>
-        </div>
       </div>
       <div class="mx-auto max-w-[1640px] px-5 pt-16 lg:px-9">
         <div class="overflow-hidden whitespace-nowrap text-center leading-[0.9] tracking-[0.06em] text-transparent" style="font-size:clamp(56px,12.4vw,210px);-webkit-text-stroke:1px #d8d5cd">NOBLE MUSE</div>
