@@ -6,29 +6,42 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Clothing — NOBLE MUSE" description="The Noble Muse catalogue: dresses, blouses, knitwear, tailoring and denim in ink, cream and mulberry.">
-  <main class="mx-auto max-w-[1640px] px-5 pt-[150px] lg:px-9">
+  <main class="mx-auto max-w-[1640px] px-4 pt-[132px] sm:px-5 sm:pt-[150px] lg:px-9">
     <div class="mb-11 flex flex-col gap-3">
       <div class="cap-xs text-muted">HOME / <span data-crumb>CLOTHING</span></div>
       <h1 class="m-0 text-[30px] font-normal tracking-[0.2em]" data-title>CLOTHING</h1>
       <div class="text-[11px] tracking-[0.08em] text-soft" data-count></div>
     </div>
 
-    <div class="mb-11 flex flex-wrap items-center justify-between gap-6 border-y border-line py-4">
-      <div class="flex flex-wrap items-center gap-6">
-        <select data-f-cat class="cap border-none bg-transparent"></select>
-        <select data-f-size class="cap border-none bg-transparent"></select>
-        <select data-f-color class="cap border-none bg-transparent"></select>
-        <div class="flex items-center gap-3">
-          <span class="cap text-muted">Max</span>
-          <input data-f-price type="range" min="40" max="300" step="10" value="300" class="w-[130px]" />
-          <span class="text-[11px]" data-f-price-label>€300</span>
+    <div class="mb-6 border-y border-line py-3 sm:mb-11 sm:py-4">
+      <details data-f-details open>
+        <summary class="cap flex cursor-pointer list-none items-center justify-between text-muted sm:hidden [&::-webkit-details-marker]:hidden">
+          <span>Filters &amp; sort</span><span class="text-[10px]">▾</span>
+        </summary>
+        <div class="flex flex-col gap-4 pt-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-6 sm:pt-0">
+          <div class="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
+            <select data-f-cat class="cap border-none bg-transparent"></select>
+            <select data-f-size class="cap border-none bg-transparent"></select>
+            <select data-f-color class="cap border-none bg-transparent"></select>
+            <div class="flex items-center gap-3">
+              <span class="cap text-muted">Max</span>
+              <input data-f-price type="range" min="40" max="300" step="10" value="300" class="w-[130px]" />
+              <span class="text-[11px]" data-f-price-label>€300</span>
+            </div>
+          </div>
+          <select data-f-sort class="cap border-none bg-transparent">
+            <option value="newest">Sort: Newest</option>
+            <option value="low">Sort: Price low to high</option>
+            <option value="high">Sort: Price high to low</option>
+          </select>
         </div>
-      </div>
-      <select data-f-sort class="cap border-none bg-transparent">
-        <option value="newest">Sort: Newest</option>
-        <option value="low">Sort: Price low to high</option>
-        <option value="high">Sort: Price high to low</option>
-      </select>
+      </details>
+      <script is:inline>
+        (function () {
+          var d = document.querySelector('[data-f-details]');
+          if (d && window.matchMedia('(max-width: 639px)').matches) d.removeAttribute('open');
+        })();
+      </script>
     </div>
 
     <div data-grid class="grid grid-cols-2 gap-4 lg:grid-cols-4"></div>

@@ -95,11 +95,11 @@ const clientData = JSON.stringify({
 
     <!-- ── Masthead (fixed; transparent over the hero, solid on scroll) ── -->
     <header data-header class="fixed inset-x-0 top-0 z-[100] border-b border-transparent text-white transition-[background,color,border-color,transform] duration-[400ms]" style={heroHeader ? 'transform:translateY(36px)' : ''}>
-      <div class="mx-auto grid h-[86px] max-w-[1640px] grid-cols-[1fr_auto_1fr] items-center px-5 lg:px-9">
+      <div class="mx-auto grid h-[60px] max-w-[1640px] grid-cols-[1fr_auto_1fr] items-center px-4 sm:h-[86px] sm:px-5 lg:px-9">
         <nav class="cap flex items-center gap-4 whitespace-nowrap lg:gap-7">
-          <a href="/catalog?tag=NEW IN" data-mega-off>New In</a>
+          <a href="/catalog?tag=NEW IN" data-mega-off class="hidden sm:inline">New In</a>
           <a href="/catalog" data-mega-on class="hidden sm:inline">Clothing</a>
-          <a href="/catalog?tag=LAST CHANCE" data-mega-off data-lastchance>Last Chance</a>
+          <a href="/catalog?tag=LAST CHANCE" data-mega-off data-lastchance class="hidden sm:inline">Last Chance</a>
           <a href="/#looks" data-mega-off class="hidden md:inline">Shop the Look</a>
         </nav>
         <a href="/" data-mega-off class="flex flex-col items-center gap-1.5">
@@ -214,9 +214,27 @@ const clientData = JSON.stringify({
       </div>
       <div class="mx-auto flex max-w-[1640px] flex-wrap justify-between gap-4 px-5 pb-10 pt-6 text-[10px] tracking-[0.1em] text-muted lg:px-9">
         <span>© <span data-year></span> Noble Muse GmbH — Muse theme for Astro · {providerName} provider</span>
+        <span class="flex flex-wrap gap-5">
+          <a href="https://github.com/njbSaab/astro-njx-muse" target="_blank" rel="noopener">Free theme — ★ star it on GitHub</a>
+          <a href="https://njxui.dev/themes" target="_blank" rel="noopener">More themes → njX UI</a>
+        </span>
         <span class="flex gap-5"><a href="#">Imprint</a><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookie settings</a></span>
       </div>
     </footer>
+
+    <!-- ── Thank-you popup (free theme promo) ── -->
+    <div data-thanks-root class="fixed inset-0 z-[170] hidden items-center justify-center bg-ink/40 p-3 sm:p-6 [&.on]:flex">
+      <div class="flex w-[min(430px,100%)] flex-col gap-5 border border-line bg-white p-5 sm:p-8">
+        <div class="flex items-baseline justify-between gap-4">
+          <span class="cap-xs text-muted">Merci · thank you</span>
+          <button data-thanks-close class="cap cursor-pointer" style="letter-spacing:.18em">Close</button>
+        </div>
+        <div class="text-[20px] font-normal tracking-[0.18em]">DRESSED TO MUSE</div>
+        <p class="m-0 text-[12.5px] leading-[1.8] tracking-[0.04em] text-soft">This storefront is a free open-source theme. Grab the full template on GitHub — and if it made you smile, a star would make our day.</p>
+        <a href="https://github.com/njbSaab/astro-njx-muse" target="_blank" rel="noopener" class="btn-ink p-4 text-center">★ STAR ASTRO-NJX-MUSE ON GITHUB</a>
+        <p class="m-0 text-[11.5px] leading-[1.8] tracking-[0.04em] text-muted">More free themes — and the Pro edition of this one — live at <a href="https://njxui.dev/themes" target="_blank" rel="noopener" class="underline underline-offset-4">njxui.dev/themes</a>.</p>
+      </div>
+    </div>
 
     <!-- ── Drawer overlay ── -->
     <div data-overlay class="pointer-events-none fixed inset-0 z-[150] bg-ink/30 opacity-0 transition-opacity duration-[400ms] [&.on]:pointer-events-auto [&.on]:opacity-100"></div>
@@ -418,7 +436,11 @@ const clientData = JSON.stringify({
         if (t.dataset.lInc) { const l = line(t.dataset.lInc); if (l) setCartQty(l.key, l.quantity + 1); }
         if (t.dataset.lDec) { const l = line(t.dataset.lDec); if (l) setCartQty(l.key, l.quantity - 1); }
       });
-      $('[data-checkout]')?.addEventListener('click', () => toast('Demo checkout — connect Shopify for the real one'));
+      $('[data-checkout]')?.addEventListener('click', () => { $('[data-thanks-root]')?.classList.add('on'); });
+      $('[data-thanks-root]')?.addEventListener('click', (e) => {
+        const t = e.target as HTMLElement;
+        if (t === $('[data-thanks-root]') || t.closest('[data-thanks-close]')) $('[data-thanks-root]')!.classList.remove('on');
+      });
 
       // ── wishlist ──────────────────────────────────────────────
       function renderWish() {
