@@ -95,8 +95,8 @@ const clientData = JSON.stringify({
 
     <!-- ── Masthead (fixed; transparent over the hero, solid on scroll) ── -->
     <header data-header class="fixed inset-x-0 top-0 z-[100] border-b border-transparent text-white transition-[background,color,border-color,transform] duration-[400ms]" style={heroHeader ? 'transform:translateY(36px)' : ''}>
-      <div class="mx-auto grid h-[60px] max-w-[1640px] grid-cols-[1fr_auto_1fr] items-center px-4 sm:h-[86px] sm:px-5 lg:px-9">
-        <nav class="cap flex items-center gap-4 whitespace-nowrap lg:gap-7">
+      <div class="mx-auto flex h-[60px] max-w-[1640px] items-center justify-between px-4 sm:grid sm:h-[86px] sm:grid-cols-[1fr_auto_1fr] sm:px-5 lg:px-9">
+        <nav class="cap hidden items-center gap-4 whitespace-nowrap sm:flex lg:gap-7">
           <a href="/catalog?tag=NEW IN" data-mega-off class="hidden sm:inline">New In</a>
           <a href="/catalog" data-mega-on class="hidden sm:inline">Clothing</a>
           <a href="/catalog?tag=LAST CHANCE" data-mega-off data-lastchance class="hidden sm:inline">Last Chance</a>
@@ -106,12 +106,12 @@ const clientData = JSON.stringify({
           <span class="whitespace-nowrap text-[clamp(15px,1.5vw,24px)] font-normal leading-none tracking-[0.42em]" style="text-indent:.42em">NOBLE MUSE</span>
           <span class="whitespace-nowrap text-[7px] leading-none tracking-[0.44em] opacity-70" style="text-indent:.44em">DRESSING MODERN MUSES</span>
         </a>
-        <div class="flex items-center justify-end gap-4 whitespace-nowrap lg:gap-6" data-mega-off>
+        <div class="order-first flex items-center justify-end gap-4 whitespace-nowrap sm:order-none lg:gap-6" data-mega-off>
           <button data-search-toggle aria-label="Search" class="flex cursor-pointer items-center">
             <svg width="17" height="17" viewBox="0 0 17 17" fill="none" stroke="currentColor" stroke-width="1.1"><circle cx="7.2" cy="7.2" r="5.4"/><line x1="11.2" y1="11.2" x2="16" y2="16"/></svg>
           </button>
           <button data-open-wish aria-label="Wishlist" class="flex cursor-pointer items-center gap-1.5 text-[10px] tracking-[0.12em]">
-            <span class="text-[14px] leading-none">♥</span><span data-wish-count>0</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span data-wish-count>0</span>
           </button>
           <button data-open-cart aria-label="Bag" class="flex cursor-pointer items-center gap-1.5 text-[10px] tracking-[0.12em]">
             <svg width="15" height="17" viewBox="0 0 15 17" fill="none" stroke="currentColor" stroke-width="1.1"><rect x="1" y="5" width="13" height="11"/><path d="M4.6 5.2V3.6a2.9 2.9 0 0 1 5.8 0v1.6"/></svg>
@@ -144,6 +144,10 @@ const clientData = JSON.stringify({
             </div>
           </div>
           <div class="hidden flex-col items-start justify-end gap-4 border-l border-line pl-10 md:flex lg:pl-16">
+            <a href="/catalog" class="relative block w-full overflow-hidden">
+              <img src="/products/hero-2.jpg" alt="Golden Hour campaign" loading="lazy" class="aspect-[16/10] w-full object-cover transition-transform duration-500 hover:scale-[1.03]" />
+              <span class="note absolute left-3 top-2.5 text-white/85">campaign 02 · golden hour</span>
+            </a>
             <div class="text-[26px] leading-snug tracking-[0.14em]">GOLDEN HOUR</div>
             <div class="max-w-[34ch] text-[12px] leading-loose text-soft">Tweed, brushed wool and washed silk in mulberry, cream and ink. The autumn edit, made to be worn past the season.</div>
             <a href="/catalog" class="cap link-u" style="letter-spacing:.2em">Shop the collection</a>
@@ -173,7 +177,7 @@ const clientData = JSON.stringify({
     <slot />
 
     <!-- ── Footer ── -->
-    <footer class="mt-32 border-t border-line">
+    <footer class="mt-14 border-t border-line sm:mt-24 lg:mt-32">
       <div class="mx-auto grid max-w-[1640px] gap-10 px-5 pt-20 md:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_1.2fr] lg:gap-12 lg:px-9">
         {[
           ['Shop', ['New In', 'Clothing', 'Last Chance', 'Shop the Look', 'Gift cards']],
@@ -328,7 +332,12 @@ const clientData = JSON.stringify({
         header.classList.toggle('border-line', solid);
         header.classList.toggle('border-transparent', !solid);
         header.style.transform = scrolled || !heroMode ? 'translateY(0)' : 'translateY(36px)';
-        $$('[data-lastchance],[data-lastchance-m]').forEach((lc) => (lc.style.color = solid ? '#6f5bd6' : '#c8bef5'));
+        $$('[data-lastchance],[data-lastchance-m]').forEach((lc) => {
+          lc.style.color = '';
+          lc.style.textDecoration = 'underline';
+          lc.style.textUnderlineOffset = '6px';
+          lc.style.textDecorationColor = solid ? '#6f5bd6' : '#c8bef5';
+        });
       }
       if (heroMode) {
         addEventListener('scroll', () => {
@@ -493,9 +502,12 @@ const clientData = JSON.stringify({
           ['ship', 'Delivery & returns', 'Free delivery on orders above €150. Returns free within 30 days.'],
         ];
         $('[data-qv-panel]')!.innerHTML = `
-          <div class="flex flex-col gap-0.5 bg-tint">
-            <img src="${p.image}" alt="${esc(p.name)}" class="aspect-[3/4] w-full object-cover" />
-            ${p.image2 ? `<img src="${p.image2}" alt="" class="aspect-[3/4] w-full object-cover" />` : ''}
+          <div class="flex flex-col gap-2 bg-tint p-2">
+            <img data-qv-main src="${p.image}" alt="${esc(p.name)}" class="aspect-[3/4] w-full object-cover" />
+            ${p.image2 ? `<div class="flex gap-2">
+              <button data-qv-img="${p.image}" class="w-[64px] flex-none cursor-pointer border border-ink"><img src="${p.image}" alt="" class="aspect-[3/4] w-full object-cover" /></button>
+              <button data-qv-img="${p.image2}" class="w-[64px] flex-none cursor-pointer border border-line opacity-80 hover:opacity-100"><img src="${p.image2}" alt="" class="aspect-[3/4] w-full object-cover" /></button>
+            </div>` : ''}
           </div>
           <div class="flex flex-col gap-5 p-8 lg:p-12">
             <div class="flex items-start justify-between gap-5">
@@ -531,9 +543,36 @@ const clientData = JSON.stringify({
           </div>`;
         qvRoot.classList.add('on');
       }
+      // active nav item — underline (desktop + mobile rows)
+      (() => {
+        const tag = new URLSearchParams(location.search).get('tag');
+        const here = location.pathname;
+        $$('header nav a').forEach((a) => {
+          const u = new URL((a as HTMLAnchorElement).href);
+          const uTag = u.searchParams.get('tag');
+          const on = here.startsWith('/catalog') && u.pathname === '/catalog' && (uTag ?? '') === (tag ?? '');
+          if (on) {
+            (a as HTMLElement).style.textDecoration = 'underline';
+            (a as HTMLElement).style.textUnderlineOffset = '6px';
+          }
+        });
+      })();
+
       $('[data-qv-panel]')?.addEventListener('click', (e) => {
         const t = e.target as HTMLElement;
         if (t.closest('[data-qv-close]')) { qvClose(); return; }
+        const gi = t.closest('[data-qv-img]') as HTMLElement | null;
+        if (gi) {
+          const main = $('[data-qv-main]') as HTMLImageElement | null;
+          if (main) main.src = gi.dataset.qvImg!;
+          $$('[data-qv-img]').forEach((x) => {
+            const on = x === gi;
+            x.classList.toggle('border-ink', on);
+            x.classList.toggle('border-line', !on);
+            x.classList.toggle('opacity-80', !on);
+          });
+          return;
+        }
         const co = t.closest('[data-qv-color]') as HTMLElement | null;
         if (co) { qvState.color = Number(co.dataset.qvColor); openQuickView(qvState.handle, true); return; }
         const sz = t.closest('[data-qv-size]') as HTMLElement | null;

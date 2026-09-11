@@ -131,7 +131,7 @@ const LOOKS = [
       <h2 class="m-0 text-[15px] font-normal tracking-[0.26em]">SHOP THE LOOK</h2>
       <span class="cap-xs text-muted">Tap + to shop each look</span>
     </div>
-    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4" style="grid-auto-rows:210px">
+    <div class="grid grid-cols-2 gap-4 lg:grid-cols-5" style="grid-auto-rows:210px">
       {LOOKS.map((l, i) => (
         <div class="relative overflow-hidden bg-[#e6e2da]" style={`grid-row:span ${l.span}`} data-look={i}>
           <img src={l.img} alt={l.note} loading="lazy" class="absolute inset-0 h-full w-full object-cover" />

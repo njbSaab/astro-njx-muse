@@ -45,15 +45,39 @@ const ACCS = [
 <Layout title={`${p.title} — NOBLE MUSE`} description={p.description} ogImage={p.images[0]?.src}>
   <script type="application/ld+json" set:html={productLd} />
 
-  <main class="mx-auto max-w-[1640px] px-4 pt-[132px] sm:px-5 sm:pt-[130px] lg:px-9">
-    <div class="cap-xs mb-8 text-muted">
+  <main class="mx-auto max-w-[1640px] px-4 pt-[84px] sm:px-5 sm:pt-[80px] lg:px-9">
+    <div class="cap-xs mb-5 text-muted sm:mb-8">
       <a href="/">HOME</a> / <a href={`/catalog?cat=${encodeURIComponent(meta.cat)}`}>{meta.cat.toUpperCase()}</a> / {p.title.toUpperCase()}
     </div>
 
     <article class="grid gap-10 lg:grid-cols-2 lg:gap-16">
-      <div class="grid gap-0.5 bg-tint sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-        <img src={p.images[0]?.src} alt={p.title} class="aspect-[3/4] w-full object-cover" />
-        {p.images[1] && <img src={p.images[1].src} alt={p.images[1].alt} class="aspect-[3/4] w-full object-cover" />}
+      <div class="flex flex-col gap-2">
+        <img data-g-main src={p.images[0]?.src} alt={p.title} class="aspect-[3/4] w-full bg-tint object-cover" />
+        {p.images.length > 1 && (
+          <div class="flex gap-2">
+            {p.images.map((im, i) => (
+              <button data-g-thumb={im.src} class:list={['w-[72px] flex-none cursor-pointer border transition', i === 0 ? 'border-ink' : 'border-line opacity-80 hover:opacity-100']}>
+                <img src={im.src} alt={im.alt ?? p.title} class="aspect-[3/4] w-full object-cover" />
+              </button>
+            ))}
+          </div>
+        )}
+        <script is:inline>
+          (function () {
+            var main = document.querySelector('[data-g-main]');
+            document.addEventListener('click', function (e) {
+              var b = e.target.closest && e.target.closest('[data-g-thumb]');
+              if (!b || !main) return;
+              main.src = b.getAttribute('data-g-thumb');
+              document.querySelectorAll('[data-g-thumb]').forEach(function (x) {
+                var on = x === b;
+                x.classList.toggle('border-ink', on);
+                x.classList.toggle('border-line', !on);
+                x.classList.toggle('opacity-80', !on);
+              });
+            });
+          })();
+        </script>
       </div>
 
       <div class="flex max-w-[560px] flex-col gap-6">
