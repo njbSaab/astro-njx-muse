@@ -1,5 +1,7 @@
 # Noble Muse — premium womenswear storefront
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/njbSaab/astro-njx-muse) [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/njbSaab/astro-njx-muse)
+
 **Free fashion e-commerce theme for Astro.** Ink navy on white, tracked-caps
 typography, a transparent masthead over a full-height campaign slider — the
 structure of the big premium womenswear shops, built static.
